@@ -14,5 +14,7 @@
 	<classpathentry kind="lib" path="/home/jim/Downloads/citizens-2.0.8-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="/home/jim/Downloads/citizensapi-2.0.8-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="/home/jim/Downloads/Vault.jar"/>
+	<classpathentry kind="lib" path="/home/jim/Downloads/InventorySQL-3.0c.jar"/>
+	<classpathentry kind="lib" path="/home/jim/Downloads/CombatTag.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
