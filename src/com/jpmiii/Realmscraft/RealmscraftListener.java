@@ -68,20 +68,20 @@ public class RealmscraftListener  implements Listener {
 	
     @EventHandler
     public void PlayerBed(PlayerBedEnterEvent event) {
-    	String[] msg = {"Would you like to goto", "Dream Land?", "Say dream for yes."};
+    	String[] msg = {"Would you like to goto", "Dream Land?"};
         
     	event.getPlayer().sendMessage(msg);
-    	plugin.getLogger().info(event.getPlayer().getName() + " lay in bed");
+    	//plugin.getLogger().info(event.getPlayer().getName() + " lay in bed");
     }
     @EventHandler
     public void PlayerYes(AsyncPlayerChatEvent event) {
     	if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")) {
-    		plugin.getLogger().info(event.getPlayer().getName() + " has permission");
+    		//plugin.getLogger().info(event.getPlayer().getName() + " has permission");
     	
     	    if (event.getPlayer().isSleeping()) {
-    	    	plugin.getLogger().info(event.getPlayer().getName() + " is sleeping");
-    	    	String dreaming = "dream\n";
-    	    	if(event.getMessage() == dreaming) {
+    	    	//plugin.getLogger().info(event.getPlayer().getName() + " has said" + event.getMessage());
+
+    	    	if(event.getMessage().equalsIgnoreCase("yes")) {
     		
     	    		plugin.getLogger().info(event.getPlayer().getName() + " has said" + event.getMessage());
     	    		ByteArrayOutputStream b = new ByteArrayOutputStream();
