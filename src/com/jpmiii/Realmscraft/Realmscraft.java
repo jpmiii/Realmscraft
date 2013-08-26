@@ -22,8 +22,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
-import com.trc202.CombatTag.CombatTag;
-import com.trc202.CombatTagApi.CombatTagApi;
+
 
 import tk.manf.InventorySQL.manager.DatabaseManager;
 
@@ -31,7 +30,7 @@ import tk.manf.InventorySQL.manager.DatabaseManager;
 public final class Realmscraft extends JavaPlugin {
 	    public Permission perms = null;
 	    public static Chat chat = null;
-	    public static CombatTagApi combatApi = null;
+
 	    public static DatabaseManager dbm = null;
 	    public Location portalLoc = null;
 
@@ -43,7 +42,7 @@ public final class Realmscraft extends JavaPlugin {
 	        
 	        this.saveDefaultConfig();
 
-	        setupCombatApi();
+
 	        dbm = DatabaseManager.getInstance();
 			getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 			getLogger().info( "[Bungee] Plugin channel registered!");
@@ -56,13 +55,7 @@ public final class Realmscraft extends JavaPlugin {
 			getLogger().info("onDisable has been invoked!");
 		}
 
-	    private boolean setupCombatApi() {
-	    	if(getServer().getPluginManager().getPlugin("CombatTag") != null){
-	    		combatApi = new CombatTagApi((CombatTag)getServer().getPluginManager().getPlugin("CombatTag")); 
-	    		
-	    	}
-	    	return combatApi != null;
-	    }
+
 
 	    private boolean setupPermissions() {
 	        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
