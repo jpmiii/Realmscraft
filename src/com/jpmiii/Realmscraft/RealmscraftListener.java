@@ -7,6 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.Location;
@@ -64,5 +66,31 @@ public class RealmscraftListener  implements Listener {
         
     }
 	
-
+    @EventHandler
+    public void PlayerBed(PlayerBedEnterEvent event) {
+    	String[] msg = {"Would you like to goto", "Dream Land?", "Say dream for yes."};
+        
+    	event.getPlayer().sendMessage(msg);
+    	plugin.getLogger().info(event.getPlayer().getName() + " lay in bed");
+    }
+    @EventHandler
+    public void PlayerYes(AsyncPlayerChatEvent event) {
+    	if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")) {
+    	
+    	    if (event.getPlayer().isSleeping() && event.getMessage() == "dream") {
+    		
+    		    ByteArrayOutputStream b = new ByteArrayOutputStream();
+    		    DataOutputStream out = new DataOutputStream(b);
+    		 
+    	    	try {
+    		        out.writeUTF("Connect");
+    		        out.writeUTF(plugin.getConfig().getString("sleepServer")); // Target Server
+    		    } catch (IOException e) {
+    		    // Can never happen
+    		    }
+    		    event.getPlayer().sendPluginMessage(this.plugin, "BungeeCord", b.toByteArray());
+    	    }
+    	}
+    	
+    }
 }
