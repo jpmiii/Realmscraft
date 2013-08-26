@@ -10,6 +10,7 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 
 
+import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitTask;
 
 
@@ -28,16 +29,19 @@ import tk.manf.InventorySQL.manager.DatabaseManager;
 
 
 public final class Realmscraft extends JavaPlugin {
-	 public static Permission perms = null;
+	    public Permission perms = null;
 	    public static Chat chat = null;
 	    public static CombatTagApi combatApi = null;
 	    public static DatabaseManager dbm = null;
+	    public Location portalLoc = null;
 
 		
 		public void onEnable(){
 			//getLogger().info("onEnable has been invoked!");
 			getServer().getPluginManager().registerEvents(new RealmscraftListener(this), this);
 	        setupPermissions();
+	        
+	        this.saveDefaultConfig();
 
 	        setupCombatApi();
 	        dbm = DatabaseManager.getInstance();
@@ -69,48 +73,26 @@ public final class Realmscraft extends JavaPlugin {
 		public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 			if(cmd.getName().equalsIgnoreCase("rc")){ 
 				// doSomething
-			    if(!(sender instanceof Player)) {
-			    	this.getServer().dispatchCommand(sender, "time set 0");
-			    	getLogger().info("time reset");
-			        return true;
-			    }
+
 		        
 				Player player = (Player) sender;
 				if(args.length > 0){
-					if(args[0].equalsIgnoreCase("time")){
-						if(perms.has(player, "worldedit.wand")) {
-							this.getServer().dispatchCommand(this.getServer().getConsoleSender(), "time set 0");
-							sender.sendMessage("You are changed time!");
-						} else {
-							sender.sendMessage("You suck!");
-						}
-						return true;
-					}
 
-					if(args[0].equalsIgnoreCase("tag")){
-				        combatApi.tagPlayer(sender.getName());
-				        sender.sendMessage("tagged");
-				        
-
-						//this.getServer().dispatchCommand(this.getServer().getConsoleSender(), "tp jpmiii 140 64 280");
-						
-
-						return true;
-					}
 					if(args[0].equalsIgnoreCase("s")){
+						if(perms.has(player, "realmscraft.s")) {
 				        
-						dbm.savePlayer(player);
-						ByteArrayOutputStream b = new ByteArrayOutputStream();
-						DataOutputStream out = new DataOutputStream(b);
+						    dbm.savePlayer(player);
+						    ByteArrayOutputStream b = new ByteArrayOutputStream();
+						    DataOutputStream out = new DataOutputStream(b);
 						 
-						try {
-						    out.writeUTF("Connect");
-						    out.writeUTF("w2"); // Target Server
-						} catch (IOException e) {
+					    	try {
+						        out.writeUTF("Connect");
+						        out.writeUTF(this.getConfig().getString("portalServer")); // Target Server
+						    } catch (IOException e) {
 						    // Can never happen
+						    }
+						    player.sendPluginMessage(this, "BungeeCord", b.toByteArray());
 						}
-						player.sendPluginMessage(this, "BungeeCord", b.toByteArray());
-						
 
 						return true;
 					}

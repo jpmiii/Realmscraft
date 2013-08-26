@@ -39,27 +39,27 @@ public class RealmscraftListener  implements Listener {
     public void portalStep(PlayerInteractEvent event) {
     	
     	if (event.getAction() == Action.PHYSICAL) {
-    		Location portalLoc = new  Location(event.getPlayer().getWorld(),0.0,61.0, 0.0) ;
-    		if (event.getClickedBlock().getLocation() ==  portalLoc){//.getBlockX() == 150 && event.getClickedBlock().getLocation().getBlockY() == 61 && event.getClickedBlock().getLocation().getBlockZ() == 150  ) {
+    		plugin.portalLoc = new  Location(event.getPlayer().getWorld(),0,61, 0) ;
+    		if (event.getClickedBlock().getLocation().distance(plugin.portalLoc) <=  5){
+    			if(plugin.perms.has(event.getPlayer(), "realmscraft.portal")) {
+    		        Realmscraft.dbm.savePlayer(event.getPlayer());
     		
-    		    Realmscraft.dbm.savePlayer(event.getPlayer());
-    		
-			    ByteArrayOutputStream b = new ByteArrayOutputStream();
-			    DataOutputStream out = new DataOutputStream(b);
+			        ByteArrayOutputStream b = new ByteArrayOutputStream();
+			        DataOutputStream out = new DataOutputStream(b);
 			 
-			    try {
-			        out.writeUTF("Connect");
-			        out.writeUTF("w3"); // Target Server
-			    } catch (IOException e) {
+			        try {
+			            out.writeUTF("Connect");
+			            out.writeUTF(plugin.getConfig().getString("portalServer")); // Target Server
+			        } catch (IOException e) {
 			        // Can never happen
-			    }
-			    event.getPlayer().sendPluginMessage(this.plugin, "BungeeCord", b.toByteArray());
-    		    this.plugin.getLogger().info(event.getClickedBlock().getLocation().toString());
+			        }
+			        event.getPlayer().sendPluginMessage(this.plugin, "BungeeCord", b.toByteArray());
+    		        this.plugin.getLogger().info(event.getClickedBlock().getLocation().toString());
+    		    }
     		}
     	}
 
-       // Realmscraft.combatApi.tagPlayer(event.getPlayer().getDisplayName());
-    	
+  	
  
         
     }

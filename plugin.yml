@@ -1,10 +1,10 @@
 name: Realmscraft
 main: com.jpmiii.Realmscraft.Realmscraft
 version: 0.1
-depend: [Vault,InventorySQL,CombatTag]
+depend: [Vault,InventorySQL]
 commands:
-   jc:
+   rc:
       description: This is a demo command.
-      usage: /jc [h] [tperm][drop] [t] [s]
-      permission: Realmscraft.basic
+      usage: /rc  [s]
+      permission: realmscraft.s
       permission-message: You don't have Realmscraft permission
