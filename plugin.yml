@@ -1,10 +1,9 @@
 name: Realmscraft
 main: com.jpmiii.Realmscraft.Realmscraft
 version: 0.1
-depend: [Vault,InventorySQL]
+depend: [Vault, InventorySQL]
 commands:
    rc:
-      description: This is a demo command.
+      description: activate portal
       usage: /rc  [s]
-      permission: realmscraft.s
-      permission-message: You don't have Realmscraft permission
+

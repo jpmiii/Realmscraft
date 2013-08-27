@@ -1,2 +1,8 @@
 portalServer: "w2"
 sleepServer: "w3"
+worldName: "world"
+minX: -100
+maxX: 100
+minZ: -100
+maxZ: 100
+portalMoveChance: .5
