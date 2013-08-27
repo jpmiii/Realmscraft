@@ -7,11 +7,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 
 import com.jpmiii.Realmscraft.Realmscraft;
 public class RealmscraftListener  implements Listener {
@@ -22,12 +25,45 @@ public class RealmscraftListener  implements Listener {
     	this.plugin = plugin;
 	}
     
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void spawn(CreatureSpawnEvent event) {
+    	Location el = event.getLocation();
+    	//SpawnReason sr = event.getSpawnReason();
+    	EntityType et = event.getEntity().getType();
+    	if (el.getWorld().getName().equalsIgnoreCase("world")){
+    		
+    		//if(sr == SpawnReason.NATURAL || sr == SpawnReason.DEFAULT || sr == SpawnReason.CHUNK_GEN) {
+    			
 
+    	        if (et == EntityType.CREEPER || et == EntityType.ENDERMAN || 
+    	        		et == EntityType.SPIDER || et == EntityType.SKELETON ||
+    	        		et == EntityType.ZOMBIE) {
+    	        	if (el.getY() > 55 || el.getBlock().getLightLevel() > 11) {
+		                event.setCancelled(true);
+		            }
+
+
+     		  //  }   	   
+    	    }
+    	    
+    	}
+    	if (et == EntityType.BAT ||
+    			et == EntityType.ENDER_DRAGON ||
+    			et == EntityType.IRON_GOLEM ||
+    			et == EntityType.OCELOT ||
+    			et == EntityType.SILVERFISH ||
+    			et == EntityType.VILLAGER ||
+    			et == EntityType.WITCH ||
+    			et == EntityType.WOLF ){
+    		event.setCancelled(true);
+    	}
+
+    }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void normalLogin(PlayerLoginEvent event) {
 
-        //Realmscraft.combatApi.tagPlayer(event.getPlayer().getDisplayName());
+
     	try {
 			Realmscraft.dbm.loadPlayer(event.getPlayer());
 		} catch (Exception e) {
@@ -42,9 +78,11 @@ public class RealmscraftListener  implements Listener {
     	
     	if (event.getAction() == Action.PHYSICAL) {
     		plugin.portalLoc = new  Location(event.getPlayer().getWorld(),0,61, 0) ;
-    		if (event.getClickedBlock().getLocation().distance(plugin.portalLoc) <=  5){
+    		if (event.getClickedBlock().getLocation().distance(plugin.portalLoc) <=  5 && !plugin.hotPlayers.containsKey(event.getPlayer().getName())){
     			if(plugin.perms.has(event.getPlayer(), "realmscraft.portal")) {
     		        Realmscraft.dbm.savePlayer(event.getPlayer());
+    		        
+    		        plugin.hotPlayers.put(event.getPlayer().getName(), System.currentTimeMillis( ));
     		
 			        ByteArrayOutputStream b = new ByteArrayOutputStream();
 			        DataOutputStream out = new DataOutputStream(b);

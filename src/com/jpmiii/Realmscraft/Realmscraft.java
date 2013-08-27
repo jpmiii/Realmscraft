@@ -4,6 +4,7 @@ package com.jpmiii.Realmscraft;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 
 import net.milkbowl.vault.chat.Chat;
@@ -33,6 +34,7 @@ public final class Realmscraft extends JavaPlugin {
 
 	    public static DatabaseManager dbm = null;
 	    public Location portalLoc = null;
+	    public HashMap<String,Long > hotPlayers = new HashMap<String,Long >();
 
 		
 		public void onEnable(){
@@ -41,6 +43,7 @@ public final class Realmscraft extends JavaPlugin {
 	        setupPermissions();
 	        
 	        this.saveDefaultConfig();
+	        getServer().getWorld("world").setMonsterSpawnLimit(10);
 
 
 	        dbm = DatabaseManager.getInstance();

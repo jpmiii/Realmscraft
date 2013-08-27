@@ -1,7 +1,11 @@
 package com.jpmiii.Realmscraft;
 
 
+import java.util.Map;
+
 import org.bukkit.scheduler.BukkitRunnable;
+
+
 
 import com.jpmiii.Realmscraft.Realmscraft;
 public class RealmscraftTask extends BukkitRunnable {
@@ -12,8 +16,12 @@ public class RealmscraftTask extends BukkitRunnable {
     }
  
     public void run() {
-        // What you want to schedule goes here
-        //plugin.getServer().broadcastMessage("Welcome to Bukkit! Remember to read the documentation!");
-    	
+
+    	for (Map.Entry<String, Long> entry : plugin.hotPlayers.entrySet()) {
+    	    //System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+    		if (entry.getValue()+180000 > System.currentTimeMillis()){
+    			plugin.hotPlayers.remove(entry.getKey());
+    		}
+    	}
     }
 }
