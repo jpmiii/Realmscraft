@@ -33,8 +33,8 @@ import tk.manf.InventorySQL.manager.DatabaseManager;
 public final class Realmscraft extends JavaPlugin {
 	    public Permission perms = null;
 	    public static Chat chat = null;
-
-
+	    
+	    
 	    public static DatabaseManager dbm = null;
 	    public Location portalLoc = null;
 	    public HashMap<String,Long > hotPlayers = new HashMap<String,Long >();
