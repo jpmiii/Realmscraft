@@ -77,10 +77,12 @@ public class RealmscraftListener  implements Listener {
 	
     @EventHandler
     public void PlayerBed(PlayerBedEnterEvent event) {
-    	String[] msg = {"Would you like to goto", "Dream Land?"};
-        
-    	event.getPlayer().sendMessage(msg);
-    	//plugin.getLogger().info(event.getPlayer().getName() + " lay in bed");
+    	if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep") && !plugin.getConfig().getString("sleepServer").isEmpty()) {
+    		String[] msg = {"Would you like to goto", "Dream Land?"};
+    		event.getPlayer().sendMessage(msg);
+    		
+    	}
+
     }
     @EventHandler
     public void PlayerYes(AsyncPlayerChatEvent event) {
@@ -92,7 +94,7 @@ public class RealmscraftListener  implements Listener {
 
     	    	if(event.getMessage().equalsIgnoreCase("yes")) {
     		
-    	    		plugin.getLogger().info(event.getPlayer().getName() + " has said" + event.getMessage());
+    	    		plugin.combatApi.untagPlayer(event.getPlayer().getName());
     	    		ByteArrayOutputStream b = new ByteArrayOutputStream();
     		        DataOutputStream out = new DataOutputStream(b);
     		 

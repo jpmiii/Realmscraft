@@ -17,12 +17,18 @@ import org.bukkit.scheduler.BukkitTask;
 
 
 
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
+
+
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.trc202.CombatTag.CombatTag;
+import com.trc202.CombatTagApi.CombatTagApi;
 
 
 
@@ -33,7 +39,7 @@ import tk.manf.InventorySQL.manager.DatabaseManager;
 public final class Realmscraft extends JavaPlugin {
 	    public Permission perms = null;
 	    public static Chat chat = null;
-	    
+	    public  CombatTagApi combatApi = null;
 	    
 	    public static DatabaseManager dbm = null;
 	    public Location portalLoc = null;
@@ -49,7 +55,7 @@ public final class Realmscraft extends JavaPlugin {
 	        setupPermissions();
 	        
 	        
-
+	        setupCombatApi();
 	        
 
 	        dbm = DatabaseManager.getInstance();
@@ -73,7 +79,13 @@ public final class Realmscraft extends JavaPlugin {
 			
 			this.portalLoc = new Location(wld,xloc,yloc,zloc);
 		}
-
+	    private boolean setupCombatApi() {
+	    	if(getServer().getPluginManager().getPlugin("CombatTag") != null){
+	    		combatApi = new CombatTagApi((CombatTag)getServer().getPluginManager().getPlugin("CombatTag")); 
+	    		
+	    	}
+	    	return combatApi != null;
+	    }
 
 
 	    private boolean setupPermissions() {
@@ -99,7 +111,9 @@ public final class Realmscraft extends JavaPlugin {
 
 					if(args[0].equalsIgnoreCase("s")){
 						if(perms.has(player, "realmscraft.s")  && !this.getConfig().getString("portalServer").isEmpty()) {
-				        
+							
+							getServer().getPlayer(player.getName()).updateInventory();
+
 						    dbm.savePlayer(player);
 						    ByteArrayOutputStream b = new ByteArrayOutputStream();
 						    DataOutputStream out = new DataOutputStream(b);
