@@ -47,8 +47,8 @@ public class RealmscraftListener  implements Listener {
     	if (event.getAction() == Action.PHYSICAL && !plugin.getConfig().getString("portalServer").isEmpty()) {
     		//plugin.portalLoc = new  Location(event.getPlayer().getWorld(),0,61, 0) ;
     		if (event.getClickedBlock().getLocation().distance(plugin.portalLoc) <=  5 && !plugin.hotPlayers.containsKey(event.getPlayer().getName())){
-    			if(plugin.perms.has(event.getPlayer(), "realmscraft.portal")) {
-    		        event.getPlayer().saveData();
+    			if(plugin.perms.has(event.getPlayer().getPlayer(), "realmscraft.portal")) {
+    				plugin.getServer().getPlayer(event.getPlayer().getName()).updateInventory();
     	            Realmscraft.dbm.savePlayer(event.getPlayer());
     		        plugin.hotPlayers.put(event.getPlayer().getName(), System.currentTimeMillis( ));
     		
