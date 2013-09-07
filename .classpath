@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="spigot.jar"/>
 	<classpathentry kind="lib" path="InventorySQL-3.0c.jar"/>
 	<classpathentry kind="lib" path="/home/jim/git/Combat-Tag/CombatTag.jar"/>
+	<classpathentry kind="lib" path="/home/jim/git/Realmscraft/Votifier.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
