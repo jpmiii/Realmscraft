@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,6 +14,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+
+import com.vexsoftware.votifier.model.VotifierEvent;
+import com.vexsoftware.votifier.model.Vote;
 
 import com.jpmiii.Realmscraft.Realmscraft;
 
@@ -87,7 +91,7 @@ public class RealmscraftListener implements Listener {
 	public void PlayerBed(PlayerBedEnterEvent event) {
 		if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")
 				&& !plugin.getConfig().getString("sleepServer").isEmpty()) {
-			String[] msg = { "Would you like to goto", "Dream Land?" };
+			String[] msg = {plugin.getConfig().getString("sleepMsg") };
 			event.getPlayer().sendMessage(msg);
 
 		}
@@ -123,6 +127,23 @@ public class RealmscraftListener implements Listener {
 
 				}
 			}
+		}
+
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onVotifierEvent(VotifierEvent event) {
+		if (plugin.getConfig().getBoolean("voteServer")) {
+			Vote vote = event.getVote();
+
+			if(plugin.perms.playerAddTransient(
+					plugin.getConfig().getString("worldName"),
+					vote.getUsername(), "realmscraft.sleep")){
+			plugin.getServer().getPlayer(vote.getUsername()).sendMessage("sleep added");
+			} else {
+				plugin.getLogger().warning("no sleep");
+			}
+
 		}
 
 	}

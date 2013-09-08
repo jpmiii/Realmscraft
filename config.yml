@@ -5,5 +5,7 @@ minX: -100
 maxX: 100
 minZ: -100
 maxZ: 100
-portalMoveChance: .5
+portalMoveChance: .99
 useSQL: false
+voteServer: false
+sleepMsg: "Would you like to dream?"

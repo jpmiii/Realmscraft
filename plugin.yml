@@ -1,10 +1,10 @@
 name: Realmscraft
 main: com.jpmiii.Realmscraft.Realmscraft
 version: 0.1
-depend: [Vault]
+depend: [Vault,Votifier]
 softdepend: [InventorySQL]
 commands:
    rc:
       description: activate portal
-      usage: /rc  [s]
-
+      usage: /rc  [s] [c]
+      permission-message: You don't have that Realmscraft permission
