@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
@@ -48,38 +49,42 @@ public class RealmscraftListener implements Listener {
 
 		if (event.getAction() == Action.PHYSICAL
 				&& !plugin.getConfig().getString("portalServer").isEmpty()) {
-			// plugin.portalLoc = new
-			// Location(event.getPlayer().getWorld(),0,61, 0) ;
-			if (event.getClickedBlock().getLocation()
-					.distance(plugin.portalLoc) <= 5
-					&& !plugin.hotPlayers.containsKey(event.getPlayer()
-							.getName())) {
-				if (plugin.perms.has(event.getPlayer().getPlayer(),
-						"realmscraft.portal")) {
-					plugin.getServer().getPlayer(event.getPlayer().getName())
-							.updateInventory();
-					if (plugin.getConfig().getBoolean("useSQL")) {
-						Realmscraft.dbm.savePlayer(event.getPlayer());
-					}
-					plugin.hotPlayers.put(event.getPlayer().getName(),
-							System.currentTimeMillis());
 
-					ByteArrayOutputStream b = new ByteArrayOutputStream();
-					DataOutputStream out = new DataOutputStream(b);
+			Location l = event.getClickedBlock().getLocation();
+			if (l.getWorld().getName() == plugin.getConfig().getString(
+					"worldName")) {
+				if (l.distance(plugin.portalLoc) <= 5
+						&& !plugin.hotPlayers.containsKey(event.getPlayer()
+								.getName())) {
+					if (plugin.perms.has(event.getPlayer().getPlayer(),
+							"realmscraft.portal")) {
+						plugin.getServer()
+								.getPlayer(event.getPlayer().getName())
+								.updateInventory();
+						if (plugin.getConfig().getBoolean("useSQL")) {
+							Realmscraft.dbm.savePlayer(event.getPlayer());
+						}
+						plugin.hotPlayers.put(event.getPlayer().getName(),
+								System.currentTimeMillis());
 
-					try {
-						out.writeUTF("Connect");
-						out.writeUTF(plugin.getConfig().getString(
-								"portalServer")); // Target Server
-					} catch (IOException e) {
-						// Can never happen
-					}
-					event.getPlayer().sendPluginMessage(this.plugin,
-							"BungeeCord", b.toByteArray());
-					this.plugin.getLogger().info(
-							event.getClickedBlock().getLocation().toString());
-					if (plugin.getConfig().getBoolean("useSQL")) {
-						Realmscraft.dbm.savePlayer(event.getPlayer());
+						ByteArrayOutputStream b = new ByteArrayOutputStream();
+						DataOutputStream out = new DataOutputStream(b);
+
+						try {
+							out.writeUTF("Connect");
+							out.writeUTF(plugin.getConfig().getString(
+									"portalServer")); // Target Server
+						} catch (IOException e) {
+							// Can never happen
+						}
+						event.getPlayer().sendPluginMessage(this.plugin,
+								"BungeeCord", b.toByteArray());
+						this.plugin.getLogger().info(
+								event.getClickedBlock().getLocation()
+										.toString());
+						if (plugin.getConfig().getBoolean("useSQL")) {
+							Realmscraft.dbm.savePlayer(event.getPlayer());
+						}
 					}
 				}
 			}
@@ -91,7 +96,7 @@ public class RealmscraftListener implements Listener {
 	public void PlayerBed(PlayerBedEnterEvent event) {
 		if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")
 				&& !plugin.getConfig().getString("sleepServer").isEmpty()) {
-			String[] msg = {plugin.getConfig().getString("sleepMsg") };
+			String[] msg = { plugin.getConfig().getString("sleepMsg") };
 			event.getPlayer().sendMessage(msg);
 
 		}
@@ -135,15 +140,22 @@ public class RealmscraftListener implements Listener {
 	public void onVotifierEvent(VotifierEvent event) {
 		if (plugin.getConfig().getBoolean("voteServer")) {
 			Vote vote = event.getVote();
+			if (!(vote.getUsername() == null)) {
 
-			if(plugin.perms.playerAddTransient(
-					plugin.getConfig().getString("worldName"),
-					vote.getUsername(), "realmscraft.sleep")){
-			plugin.getServer().getPlayer(vote.getUsername()).sendMessage("sleep added");
+				if (plugin.perms.playerAddTransient(plugin.getConfig()
+						.getString("worldName"), vote.getUsername(),
+						"realmscraft.sleep")) {
+					if (!(plugin.getServer().getPlayer(vote.getUsername()) == null)){
+					plugin.getServer().getPlayer(vote.getUsername())
+							.sendMessage("sleep added");
+					}
+				} else {
+					plugin.getLogger().warning("no sleep");
+				}
 			} else {
-				plugin.getLogger().warning("no sleep");
+				plugin.getLogger().warning("no player for sleep");
 			}
-
+			
 		}
 
 	}
