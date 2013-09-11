@@ -59,8 +59,8 @@ public final class Realmscraft extends JavaPlugin implements
 		getServer().getMessenger().registerOutgoingPluginChannel(this,
 				"BungeeCord");
 		getLogger().info("[Bungee] Plugin channel registered!");
-		BukkitTask task = new RealmscraftTask(this).runTaskTimer(this, 1200,
-				1200); // .runTaskLater(this, 20);
+		BukkitTask t = new RealmscraftTask(this).runTaskTimer(this, 1200, 1200); // .runTaskLater(this,
+																					// 20);
 		randLoc();
 
 	}
