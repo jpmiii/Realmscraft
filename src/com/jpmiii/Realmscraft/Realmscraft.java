@@ -4,8 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
@@ -16,9 +20,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
-
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -34,15 +38,20 @@ public final class Realmscraft extends JavaPlugin implements
 	public static Chat chat = null;
 	public CombatTagApi combatApi = null;
 	public Player lastPlayer = null;
-
+	private FileConfiguration customConfig = null;
+	private File customConfigFile = null;
 	public static DatabaseManager dbm = null;
 	public Location portalLoc = null;
 	public HashMap<String, Long> hotPlayers = new HashMap<String, Long>();
+	public Map<String, Object> dreamPlayers = new HashMap<String, Object>();
 
 	public void onEnable() {
 		// getLogger().info("onEnable has been invoked!");
 
 		this.saveDefaultConfig();
+		
+		this.getCustomConfig();
+		dreamPlayers = this.getCustomConfig().getConfigurationSection("players").getValues(false);
 
 		this.getServer().getMessenger()
 				.registerIncomingPluginChannel(this, "BungeeCord", this);
@@ -66,6 +75,7 @@ public final class Realmscraft extends JavaPlugin implements
 	}
 
 	public void onDisable() {
+		this.saveCustomConfig();
 		getLogger().info("onDisable has been invoked!");
 	}
 
@@ -133,6 +143,46 @@ public final class Realmscraft extends JavaPlugin implements
 		perms = rsp.getProvider();
 		return perms != null;
 	}
+	
+	public FileConfiguration getCustomConfig() {
+	    if (customConfig == null) {
+	        reloadCustomConfig();
+	    }
+	    return customConfig;
+	}
+	
+	public void saveCustomConfig() {
+	    if (customConfig == null || customConfigFile == null) {
+	        return;
+	    }
+	    try {
+	        getCustomConfig().save(customConfigFile);
+	    } catch (IOException ex) {
+	        getLogger().log(Level.SEVERE, "Could not save config to " + customConfigFile, ex);
+	    }
+	}
+	
+	public void reloadCustomConfig() {
+	    if (customConfigFile == null) {
+	    customConfigFile = new File(getDataFolder(), "save.yml");
+	    }
+	    customConfig = YamlConfiguration.loadConfiguration(customConfigFile);
+	 
+	    // Look for defaults in the jar
+	    InputStream defConfigStream = this.getResource("save.yml");
+	    if (defConfigStream != null) {
+	        YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+	        customConfig.setDefaults(defConfig);
+	    }
+	}
+	public void saveDefaultConfig() {
+	    if (customConfigFile == null) {
+	        customConfigFile = new File(getDataFolder(), "save.yml");
+	    }
+	    if (!customConfigFile.exists()) {            
+	         this.saveResource("save.yml", false);
+	     }
+	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
@@ -141,6 +191,7 @@ public final class Realmscraft extends JavaPlugin implements
 
 			if (!(sender instanceof Player)) {
 				this.reloadConfig();
+				
 				getLogger().info("config reloaded");
 				return true;
 			}
@@ -187,13 +238,23 @@ public final class Realmscraft extends JavaPlugin implements
 					}
 					return true;
 				}
+				if (args[0].equalsIgnoreCase("z")) {
+					dreamPlayers.put("jpmiii", (Object)( System.currentTimeMillis()));
+					this.getCustomConfig().createSection("players", dreamPlayers);
+					return true;
+				}
+				if (args[0].equalsIgnoreCase("a")) {
+					dreamPlayers.remove("jpmiii");
+					this.getCustomConfig().createSection("players", dreamPlayers);
+					return true;
+				}
 
 			}
 
-			// getLogger().info(args[0]);
+			
 
-		} // If this has happened the function will return true.
-			// If this hasn't happened the a value of false will be returned.
+		} 
+		
 		return false;
 	}
 }

@@ -17,6 +17,7 @@ public class RealmscraftTask extends BukkitRunnable {
 	public void run() {
 		// plugin.getLogger().info("portal moved " +
 		// plugin.portalLoc.toString());
+		
 
 		for (Map.Entry<String, Long> entry : plugin.hotPlayers.entrySet()) {
 			// System.out.println("Key = " + entry.getKey() + ", Value = " +

@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -95,6 +94,9 @@ public class RealmscraftListener implements Listener {
 	@EventHandler
 	public void PlayerBed(PlayerBedEnterEvent event) {
 		if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")
+				|| ((plugin.getCustomConfig().getLong(
+						"players." + event.getPlayer().getName()) + 86400000) < System
+						.currentTimeMillis())
 				&& !plugin.getConfig().getString("sleepServer").isEmpty()) {
 			String[] msg = { plugin.getConfig().getString("sleepMsg") };
 			event.getPlayer().sendMessage(msg);
@@ -106,6 +108,9 @@ public class RealmscraftListener implements Listener {
 	@EventHandler
 	public void PlayerYes(AsyncPlayerChatEvent event) {
 		if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")
+				|| ((plugin.getCustomConfig().getLong(
+						"players." + event.getPlayer().getName()) + 86400000) < System
+						.currentTimeMillis())
 				&& !plugin.getConfig().getString("sleepServer").isEmpty()) {
 			// plugin.getLogger().info(event.getPlayer().getName() +
 			// " has permission");
@@ -138,24 +143,40 @@ public class RealmscraftListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onVotifierEvent(VotifierEvent event) {
+		plugin.getServer().getLogger().info("votifier event");
 		if (plugin.getConfig().getBoolean("voteServer")) {
 			Vote vote = event.getVote();
 			if (!(vote.getUsername() == null)) {
-
-				if (plugin.perms.playerAddTransient(plugin.getConfig()
-						.getString("worldName"), vote.getUsername(),
-						"realmscraft.sleep")) {
-					if (!(plugin.getServer().getPlayer(vote.getUsername()) == null)){
-					plugin.getServer().getPlayer(vote.getUsername())
+				String uname = vote.getUsername();
+				uname = uname.replace(" ", "");
+				if (plugin.getServer().getPlayer(uname).isOnline()
+						&& !plugin.getCustomConfig().contains(uname)) {
+					plugin.dreamPlayers.put(uname,
+							(Object) System.currentTimeMillis());
+					plugin.getCustomConfig().createSection("players",
+							plugin.dreamPlayers);
+					plugin.saveCustomConfig();
+					plugin.getServer().getPlayer(uname)
 							.sendMessage("sleep added");
-					}
+					plugin.getLogger().info("sleep added " + uname);
+
+				} else if (plugin.getServer().getOfflinePlayer(uname)
+						.hasPlayedBefore()) {
+					plugin.dreamPlayers.put(uname,
+							(Object) System.currentTimeMillis());
+					plugin.getCustomConfig().createSection("players",
+							plugin.dreamPlayers);
+					plugin.saveCustomConfig();
+					plugin.getLogger().info(
+							"sleep added offline player " + uname);
 				} else {
-					plugin.getLogger().warning("no sleep");
+					plugin.getLogger().warning(uname + ":  player not found");
 				}
+
 			} else {
 				plugin.getLogger().warning("no player for sleep");
 			}
-			
+
 		}
 
 	}
