@@ -149,7 +149,7 @@ public class RealmscraftListener implements Listener {
 			if (!(vote.getUsername() == null)) {
 				String uname = vote.getUsername();
 				uname = uname.replace(" ", "");
-				if (plugin.getServer().getPlayer(uname).isOnline()
+				if (!(plugin.getServer().getPlayer(uname) == null)
 						&& !plugin.getCustomConfig().contains(uname)) {
 					plugin.dreamPlayers.put(uname,
 							(Object) System.currentTimeMillis());
