@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
@@ -31,6 +32,7 @@ import com.trc202.CombatTag.CombatTag;
 import com.trc202.CombatTagApi.CombatTagApi;
 
 import tk.manf.InventorySQL.manager.DatabaseManager;
+import tk.manf.InventorySQL.manager.InventoryLockingSystem;
 
 public final class Realmscraft extends JavaPlugin implements
 		PluginMessageListener {
@@ -41,6 +43,7 @@ public final class Realmscraft extends JavaPlugin implements
 	private FileConfiguration customConfig = null;
 	private File customConfigFile = null;
 	public static DatabaseManager dbm = null;
+	public static InventoryLockingSystem ils = null;
 	public Location portalLoc = null;
 	public HashMap<String, Long> hotPlayers = new HashMap<String, Long>();
 	public Map<String, Object> dreamPlayers = new HashMap<String, Object>();
@@ -63,6 +66,7 @@ public final class Realmscraft extends JavaPlugin implements
 		setupCombatApi();
 		if (this.getConfig().getBoolean("useSQL")) {
 			dbm = DatabaseManager.getInstance();
+			ils = InventoryLockingSystem.getInstance();
 		}
 
 		getServer().getMessenger().registerOutgoingPluginChannel(this,
@@ -203,10 +207,13 @@ public final class Realmscraft extends JavaPlugin implements
 					if (perms.has(player, "realmscraft.s")
 							&& !this.getConfig().getString("portalServer")
 									.isEmpty()) {
+						player.saveData();
 
-						getServer().getPlayer(player.getName())
-								.updateInventory();
-
+						//player.updateInventory();
+						if (this.getConfig().getBoolean("useSQL")) {
+							ils.addLock(player.getName());
+							dbm.savePlayer(player);
+						}
 						ByteArrayOutputStream b = new ByteArrayOutputStream();
 						DataOutputStream out = new DataOutputStream(b);
 
@@ -220,8 +227,9 @@ public final class Realmscraft extends JavaPlugin implements
 						player.sendPluginMessage(this, "BungeeCord",
 								b.toByteArray());
 						if (this.getConfig().getBoolean("useSQL")) {
-							dbm.savePlayer(player);
-						}
+							ils.removeLock(player.getName());
+						}						
+
 					}
 
 					return true;
@@ -238,14 +246,31 @@ public final class Realmscraft extends JavaPlugin implements
 					}
 					return true;
 				}
-				if (args[0].equalsIgnoreCase("z")) {
-					dreamPlayers.put("jpmiii", (Object)( System.currentTimeMillis()));
-					this.getCustomConfig().createSection("players", dreamPlayers);
+				if (args[0].equalsIgnoreCase("end")) {
+					if (player.isOp()) {
+		                World nether = Bukkit.getWorld(this.getConfig().getString("worldName") + "_the_end");
+		                Location loc = nether.getSpawnLocation();
+		                ((Player) sender).teleport(loc);
+		                return true;
+					}
 					return true;
 				}
-				if (args[0].equalsIgnoreCase("a")) {
-					dreamPlayers.remove("jpmiii");
-					this.getCustomConfig().createSection("players", dreamPlayers);
+				if (args[0].equalsIgnoreCase("nether")) {
+					if (player.isOp()) {
+		                World nether = Bukkit.getWorld(this.getConfig().getString("worldName") + "_nether");
+		                Location loc = nether.getSpawnLocation();
+		                ((Player) sender).teleport(loc);
+		                return true;
+					}
+					return true;
+				}
+				if (args[0].equalsIgnoreCase("world")) {
+					if (player.isOp()) {
+		                World nether = Bukkit.getWorld(this.getConfig().getString("worldName"));
+		                Location loc = nether.getSpawnLocation();
+		                ((Player) sender).teleport(loc);
+		                return true;
+					}
 					return true;
 				}
 

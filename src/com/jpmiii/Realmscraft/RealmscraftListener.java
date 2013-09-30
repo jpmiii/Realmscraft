@@ -10,8 +10,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 
+
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
@@ -27,8 +29,9 @@ public class RealmscraftListener implements Listener {
 		this.plugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void normalLogin(PlayerLoginEvent event) {
+
 		if (plugin.getConfig().getBoolean("useSQL")) {
 
 			try {
@@ -38,9 +41,17 @@ public class RealmscraftListener implements Listener {
 				e.printStackTrace();
 			}
 		}
+		plugin.hotPlayers.put(event.getPlayer().getName(),
+				System.currentTimeMillis());
 		event.getPlayer().setCompassTarget(plugin.portalLoc);
 		plugin.lastPlayer = event.getPlayer();
 
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void inventoryChange(PlayerDropItemEvent event) {
+		plugin.hotPlayers.put(event.getPlayer().getName(),
+				System.currentTimeMillis());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -50,17 +61,24 @@ public class RealmscraftListener implements Listener {
 				&& !plugin.getConfig().getString("portalServer").isEmpty()) {
 
 			Location l = event.getClickedBlock().getLocation();
-			if (l.getWorld().getName() == plugin.getConfig().getString(
-					"worldName")) {
-				if (l.distance(plugin.portalLoc) <= 5
-						&& !plugin.hotPlayers.containsKey(event.getPlayer()
-								.getName())) {
-					if (plugin.perms.has(event.getPlayer().getPlayer(),
-							"realmscraft.portal")) {
-						plugin.getServer()
-								.getPlayer(event.getPlayer().getName())
-								.updateInventory();
+			//plugin.getLogger().info("loc " + l.toString());
+			if (l.getWorld()
+					.getName()
+					.equalsIgnoreCase(plugin.getConfig().getString("worldName"))) {
+				//plugin.getLogger().info("name");
+
+				if (l.distance(plugin.portalLoc) <= 5) {
+					plugin.getLogger().info(
+							"dist " + plugin.portalLoc.toString());
+
+					if (plugin.hotPlayers.get(event.getPlayer().getName()) + 180000 < System
+							.currentTimeMillis()) {
+
+						event.getPlayer().saveData();
+						// event.getPlayer().updateInventory();
 						if (plugin.getConfig().getBoolean("useSQL")) {
+							Realmscraft.ils
+									.addLock(event.getPlayer().getName());
 							Realmscraft.dbm.savePlayer(event.getPlayer());
 						}
 						plugin.hotPlayers.put(event.getPlayer().getName(),
@@ -78,12 +96,13 @@ public class RealmscraftListener implements Listener {
 						}
 						event.getPlayer().sendPluginMessage(this.plugin,
 								"BungeeCord", b.toByteArray());
-						this.plugin.getLogger().info(
-								event.getClickedBlock().getLocation()
-										.toString());
+
 						if (plugin.getConfig().getBoolean("useSQL")) {
-							Realmscraft.dbm.savePlayer(event.getPlayer());
+							Realmscraft.ils.removeLock(event.getPlayer()
+									.getName());
 						}
+					} else {
+						event.getPlayer().sendMessage("cooldown not expired: " + (plugin.hotPlayers.get(event.getPlayer().getName()) + 180000 - System.currentTimeMillis()) );
 					}
 				}
 			}
@@ -93,9 +112,10 @@ public class RealmscraftListener implements Listener {
 
 	@EventHandler
 	public void PlayerBed(PlayerBedEnterEvent event) {
+
 		if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")
 				|| ((plugin.getCustomConfig().getLong(
-						"players." + event.getPlayer().getName()) + 86400000) < System
+						"players." + event.getPlayer().getName()) + 86400000) > System
 						.currentTimeMillis())
 				&& !plugin.getConfig().getString("sleepServer").isEmpty()) {
 			String[] msg = { plugin.getConfig().getString("sleepMsg") };
@@ -109,7 +129,7 @@ public class RealmscraftListener implements Listener {
 	public void PlayerYes(AsyncPlayerChatEvent event) {
 		if (plugin.perms.has(event.getPlayer(), "realmscraft.sleep")
 				|| ((plugin.getCustomConfig().getLong(
-						"players." + event.getPlayer().getName()) + 86400000) < System
+						"players." + event.getPlayer().getName()) + 86400000) > System
 						.currentTimeMillis())
 				&& !plugin.getConfig().getString("sleepServer").isEmpty()) {
 			// plugin.getLogger().info(event.getPlayer().getName() +
